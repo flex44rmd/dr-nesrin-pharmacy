@@ -22,6 +22,18 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Close mobile menu when opening to prevent body scroll
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
   const links = [
     { label: 'الرئيسية', href: '#hero' },
     { label: 'خدماتنا', href: '#features' },
@@ -113,7 +125,7 @@ export default function Navbar() {
             </a>
             <a
               href="#cta"
-              className="px-6 py-2.5 bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:shadow-primary-500/25 transition-all duration-300 hover:scale-105 active:scale-95"
+              className="px-6 py-2.5 bg-gradient-to-r from-primary-500 to-primary-600 text-white text-sm font-semibold rounded-xl hover:shadow-lg hover:shadow-primary-500/25 transition-all duration-300"
             >
               اطلب الآن
             </a>
@@ -140,9 +152,9 @@ export default function Navbar() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className="lg:hidden bg-white/95 backdrop-blur-xl border-t border-surface-200/50 overflow-y-auto max-h-[calc(100vh-80px)]"
+            className="lg:hidden bg-white/95 backdrop-blur-xl border-t border-surface-200/50"
           >
-            <div className="px-4 py-4 space-y-1">
+            <div className="px-4 py-4 space-y-1 max-h-[60vh] overflow-y-auto">
               {links.map((link) => (
                 <motion.a
                   key={link.href}
@@ -165,7 +177,7 @@ export default function Navbar() {
                 <a
                   href="#cta"
                   onClick={() => setIsOpen(false)}
-                  className="block px-4 py-3 bg-gradient-to-r from-primary-500 to-accent-500 text-white text-center font-semibold rounded-xl transition-all hover:shadow-lg hover:shadow-primary-500/25 active:scale-95"
+                  className="block px-4 py-3 bg-gradient-to-r from-primary-500 to-accent-500 text-white text-center font-semibold rounded-xl transition-all hover:shadow-lg hover:shadow-primary-500/20"
                 >
                   اطلب الآن
                 </a>
