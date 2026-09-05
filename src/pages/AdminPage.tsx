@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
   ArrowRight, Plus, Trash2, Save, LogOut, ImagePlus, Loader2,
-  CheckCircle2, AlertCircle, ShieldCheck, Upload,
+  CheckCircle2, AlertCircle, ShieldCheck, Upload, Key,
 } from 'lucide-react';
 import { CATEGORIES } from '../lib/categories';
 import { useSiteData } from '../lib/SiteDataContext';
@@ -140,9 +140,6 @@ export default function AdminPage() {
       const finalData: SiteData = { ...draft, products: finalProducts };
       await putTextFile(
         config,
-        // Must be inside public/ so Vite includes it in the build output (dist/);
-        // committing to data/site-data.json (repo root) is invisible to the build,
-        // which is why the homepage never picked up the changes.
         'public/data/site-data.json',
         JSON.stringify(finalData, null, 2),
         'تحديث بيانات الموقع من لوحة التحكم'
@@ -161,10 +158,10 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-surface-50" dir="rtl">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center justify-between mb-8 gap-4 flex-wrap">
           <a href="#/" className="inline-flex items-center gap-2 text-surface-500 hover:text-primary-600 text-sm font-medium">
-            <ArrowRight className="w-4 h-4" />
-            العودة للموقع
+            <ArrowRight className="w-4 h-4 flex-shrink-0" />
+            <span className="hidden sm:inline">العودة للموقع</span>
           </a>
           <button
             onClick={() => {
@@ -173,8 +170,8 @@ export default function AdminPage() {
             }}
             className="inline-flex items-center gap-2 text-sm text-surface-400 hover:text-red-500"
           >
-            <LogOut className="w-4 h-4" />
-            تسجيل الخروج
+            <LogOut className="w-4 h-4 flex-shrink-0" />
+            <span className="hidden sm:inline">تسجيل الخروج</span>
           </button>
         </div>
 
@@ -182,16 +179,16 @@ export default function AdminPage() {
         <p className="text-surface-500 mb-8 text-sm">إدارة المنتجات، آراء العملاء، وروابط التواصل.</p>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-8 border-b border-surface-200">
+        <div className="flex gap-2 mb-8 border-b border-surface-200 overflow-x-auto">
           {([
             ['products', 'المنتجات'],
             ['reviews', 'آراء العملاء'],
-            ['settings', 'الإعدادات والروابط'],
+            ['settings', 'الإعدادات'],
           ] as [Tab, string][]).map(([key, label]) => (
             <button
               key={key}
               onClick={() => setTab(key)}
-              className={`px-4 py-3 text-sm font-semibold border-b-2 -mb-px transition-colors ${
+              className={`px-4 py-3 text-sm font-semibold border-b-2 -mb-px transition-colors whitespace-nowrap flex-shrink-0 ${
                 tab === key ? 'border-primary-600 text-primary-600' : 'border-transparent text-surface-400 hover:text-surface-700'
               }`}
             >
@@ -278,7 +275,7 @@ export default function AdminPage() {
                       />
                     </Field>
 
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between flex-wrap gap-2">
                       <Field label="الحالة">
                         <select
                           className="admin-input"
@@ -459,19 +456,20 @@ export default function AdminPage() {
 
         {/* Save bar */}
         <div className="sticky bottom-4 mt-8">
-          <div className="bg-surface-900 rounded-2xl p-4 flex items-center justify-between gap-4 shadow-2xl">
-            <div className="flex items-center gap-2 text-white/70 text-sm">
-              {status?.type === 'ok' && <CheckCircle2 className="w-4 h-4 text-green-400" />}
-              {status?.type === 'error' && <AlertCircle className="w-4 h-4 text-red-400" />}
-              <span>{status?.text ?? 'التغييرات محلية حتى تضغطي حفظ.'}</span>
+          <div className="bg-surface-900 rounded-2xl p-4 flex items-center justify-between gap-4 shadow-2xl flex-wrap sm:flex-nowrap">
+            <div className="flex items-center gap-2 text-white/70 text-sm min-w-0">
+              {status?.type === 'ok' && <CheckCircle2 className="w-4 h-4 text-green-400 flex-shrink-0" />}
+              {status?.type === 'error' && <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />}
+              <span className="truncate">{status?.text ?? 'التغييرات محلية حتى تضغطي حفظ.'}</span>
             </div>
             <button
               onClick={handleSave}
               disabled={saving}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 hover:bg-primary-500 disabled:opacity-60 text-white font-semibold rounded-xl transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 hover:bg-primary-500 disabled:opacity-60 text-white font-semibold rounded-xl transition-colors whitespace-nowrap flex-shrink-0"
             >
               {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              حفظ التغييرات
+              <span className="hidden sm:inline">حفظ التغييرات</span>
+              <span className="sm:hidden">حفظ</span>
             </button>
           </div>
         </div>
@@ -508,6 +506,7 @@ function LoginScreen({ onLogin }: { onLogin: (c: GitHubConfig) => void }) {
   const [token, setToken] = useState('');
   const [checking, setChecking] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -526,40 +525,107 @@ function LoginScreen({ onLogin }: { onLogin: (c: GitHubConfig) => void }) {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-surface-50 px-4" dir="rtl">
-      <form onSubmit={handleSubmit} className="w-full max-w-md bg-white rounded-3xl border border-surface-100 shadow-sm p-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-surface-50 to-surface-100 px-4 py-8" dir="rtl">
+      <form onSubmit={handleSubmit} className="w-full max-w-md bg-white rounded-3xl border border-surface-100 shadow-lg p-8">
         <div className="w-12 h-12 rounded-2xl bg-primary-50 text-primary-600 flex items-center justify-center mb-4">
           <ShieldCheck className="w-6 h-6" />
         </div>
-        <h1 className="text-xl font-bold text-surface-900 mb-1">تسجيل الدخول للوحة التحكم</h1>
+        <h1 className="text-2xl font-bold text-surface-900 mb-2">لوحة التحكم</h1>
         <p className="text-surface-500 text-sm mb-6">
-          أدخلي بيانات مستودع GitHub الخاص بالموقع. تُحفظ هذه البيانات في متصفحك فقط ولا تُرسل لأي جهة أخرى.
+          سجلي الدخول لتحديث بيانات المنتجات والإعدادات. تُحفظ البيانات في متصفحك فقط.
         </p>
 
-        <div className="space-y-3">
+        <div className="space-y-4">
           <Field label="اسم المستخدم / المؤسسة على GitHub">
-            <input className="admin-input" value={owner} onChange={(e) => setOwner(e.target.value)} required placeholder="مثال: nesrin-pharmacy" />
+            <input 
+              className="admin-input" 
+              value={owner} 
+              onChange={(e) => setOwner(e.target.value)} 
+              required 
+              placeholder="مثال: nesrin-pharmacy"
+              disabled={checking}
+            />
           </Field>
           <Field label="اسم المستودع (Repository)">
-            <input className="admin-input" value={repo} onChange={(e) => setRepo(e.target.value)} required placeholder="مثال: pharmacy-site" />
+            <input 
+              className="admin-input" 
+              value={repo} 
+              onChange={(e) => setRepo(e.target.value)} 
+              required 
+              placeholder="مثال: pharmacy-site"
+              disabled={checking}
+            />
           </Field>
-          <Field label="الفرع (Branch)">
-            <input className="admin-input" value={branch} onChange={(e) => setBranch(e.target.value)} placeholder="main" />
-          </Field>
+          
+          {showAdvanced && (
+            <>
+              <Field label="الفرع (Branch)">
+                <input 
+                  className="admin-input" 
+                  value={branch} 
+                  onChange={(e) => setBranch(e.target.value)} 
+                  placeholder="main"
+                  disabled={checking}
+                />
+              </Field>
+            </>
+          )}
+          
           <Field label="GitHub Personal Access Token">
-            <input className="admin-input" type="password" value={token} onChange={(e) => setToken(e.target.value)} required placeholder="ghp_xxx..." />
+            <input 
+              className="admin-input" 
+              type="password" 
+              value={token} 
+              onChange={(e) => setToken(e.target.value)} 
+              required 
+              placeholder="ghp_xxx..."
+              disabled={checking}
+            />
+            <p className="text-xs text-surface-400 mt-1">
+              <a 
+                href="https://github.com/settings/tokens?type=beta" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-primary-600 hover:underline"
+              >
+                إنشاء token جديد
+              </a>
+            </p>
           </Field>
+
+          <button
+            type="button"
+            onClick={() => setShowAdvanced(!showAdvanced)}
+            className="text-xs text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1"
+          >
+            <Key className="w-3 h-3" />
+            {showAdvanced ? 'إخفاء' : 'إظهار'} خيارات متقدمة
+          </button>
         </div>
 
-        {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
+        {error && (
+          <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg flex gap-2">
+            <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+            <p className="text-red-700 text-sm">{error}</p>
+          </div>
+        )}
 
         <button
           type="submit"
           disabled={checking}
-          className="w-full mt-6 inline-flex items-center justify-center gap-2 py-3 bg-primary-600 hover:bg-primary-500 disabled:opacity-60 text-white font-semibold rounded-xl transition-colors"
+          className="w-full mt-6 inline-flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-primary-600 to-primary-700 hover:shadow-lg hover:shadow-primary-500/25 disabled:opacity-60 text-white font-semibold rounded-xl transition-all"
         >
-          {checking ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldCheck className="w-4 h-4" />}
-          دخول
+          {checking ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              جار التحقق...
+            </>
+          ) : (
+            <>
+              <ShieldCheck className="w-4 h-4" />
+              دخول آمن
+            </>
+          )}
         </button>
       </form>
     </div>
