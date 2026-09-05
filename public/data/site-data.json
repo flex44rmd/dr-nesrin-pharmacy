@@ -10,7 +10,17 @@
     "ratingUrl": "#testimonials",
     "ratingLabel": "تقييم"
   },
-  "products": [],
+  "products": [
+    {
+      "id": "p_1788578695644_wvrcy",
+      "categorySlug": "chronic-diseases",
+      "name": "سكشيب",
+      "image": "https://raw.githubusercontent.com/flex44rmd/dr-nesrin-pharmacy/main/public/data/uploads/1788578757078-__________2026-06-30_230228.png",
+      "shortDescription": "شسيب",
+      "detailDescription": "",
+      "status": "available"
+    }
+  ],
   "reviews": [
     {
       "id": "r1",
