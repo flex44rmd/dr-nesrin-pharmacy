@@ -34,6 +34,11 @@ export default function Navbar() {
     };
   }, [isOpen]);
 
+  // Close menu when clicking on links
+  const handleLinkClick = () => {
+    setIsOpen(false);
+  };
+
   const links = [
     { label: 'الرئيسية', href: '#hero' },
     { label: 'خدماتنا', href: '#features' },
@@ -54,10 +59,10 @@ export default function Navbar() {
           : 'bg-transparent'
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
-          <a href="#hero" className="flex items-center gap-3 group min-w-0">
+          <a href="#hero" className="flex items-center gap-2 group min-w-0 flex-shrink-0">
             {logoUrl ? (
               <img
                 src={logoUrl}
@@ -67,13 +72,13 @@ export default function Navbar() {
                 }`}
               />
             ) : (
-              <div className={`w-10 h-10 lg:w-12 lg:h-12 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-105 ${
+              <div className={`w-10 h-10 lg:w-12 lg:h-12 rounded-2xl flex items-center justify-center transition-all duration-300 group-hover:scale-105 flex-shrink-0 ${
                 scrolled ? 'bg-gradient-to-br from-primary-500 to-accent-600' : 'bg-white/20 backdrop-blur-sm'
               }`}>
                 <Pill className="w-6 h-6 lg:w-7 lg:h-7 text-white" />
               </div>
             )}
-            <div className="flex flex-col min-w-0">
+            <div className="flex flex-col min-w-0 hidden sm:flex">
               <span className={`text-lg lg:text-xl font-bold tracking-tight transition-colors duration-300 truncate ${
                 scrolled ? 'text-surface-900' : 'text-white'
               }`}>
@@ -134,10 +139,11 @@ export default function Navbar() {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className={`lg:hidden p-2 rounded-xl transition-colors ${
+            className={`lg:hidden p-2 rounded-xl transition-colors flex-shrink-0 ${
               scrolled ? 'text-surface-700' : 'text-white'
             }`}
             aria-label="Toggle menu"
+            aria-expanded={isOpen}
           >
             {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -152,23 +158,24 @@ export default function Navbar() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3 }}
-            className="lg:hidden bg-white/95 backdrop-blur-xl border-t border-surface-200/50"
+            className="lg:hidden bg-white/95 backdrop-blur-xl border-t border-surface-200/50 overflow-hidden"
           >
-            <div className="px-4 py-4 space-y-1 max-h-[60vh] overflow-y-auto">
+            <div className="px-3 sm:px-6 py-4 space-y-1 max-h-[calc(100vh-64px)] overflow-y-auto">
               {links.map((link) => (
                 <motion.a
                   key={link.href}
                   href={link.href}
-                  onClick={() => setIsOpen(false)}
+                  onClick={handleLinkClick}
                   whileHover={{ x: -4 }}
                   className="block px-4 py-3 rounded-xl text-surface-700 font-medium hover:bg-primary-50 hover:text-primary-600 transition-colors"
                 >
                   {link.label}
                 </motion.a>
               ))}
-              <div className="pt-3 border-t border-surface-200/50 space-y-2">
+              <div className="pt-3 border-t border-surface-200/50 space-y-2 mt-2">
                 <a
                   href={`tel:${data.settings.phone}`}
+                  onClick={handleLinkClick}
                   className="flex items-center gap-2 px-4 py-3 rounded-xl text-surface-600 hover:bg-surface-50 transition-colors"
                 >
                   <Phone className="w-4 h-4 flex-shrink-0" />
@@ -176,12 +183,12 @@ export default function Navbar() {
                 </a>
                 <a
                   href="#cta"
-                  onClick={() => setIsOpen(false)}
-                  className="block px-4 py-3 bg-gradient-to-r from-primary-500 to-accent-500 text-white text-center font-semibold rounded-xl transition-all hover:shadow-lg hover:shadow-primary-500/20"
+                  onClick={handleLinkClick}
+                  className="block px-4 py-3 bg-gradient-to-r from-primary-500 to-accent-500 text-white text-center font-semibold rounded-xl transition-all hover:shadow-lg hover:shadow-primary-500/30"
                 >
                   اطلب الآن
                 </a>
-                <div className="pt-3 flex justify-center pb-4">
+                <div className="pt-3 flex justify-center pb-2">
                   <SocialLinks tone="dark" size="md" solid />
                 </div>
               </div>
